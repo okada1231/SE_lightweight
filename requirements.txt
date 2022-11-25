@@ -1,11 +1,6 @@
-streamlit
+-U ginza ja-ginza
 pandas
 numpy
-sentencepiece
-fugashi
-tokenizers
-torch
-transformers
-ipadic
-mecab-python3
-
+streamlit
+spacy
+sudachipy
