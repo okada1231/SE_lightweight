@@ -1,4 +1,5 @@
--U ginza ja-ginza
+ginza
+ja-ginza
 pandas
 numpy
 streamlit
