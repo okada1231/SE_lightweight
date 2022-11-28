@@ -13,6 +13,8 @@ from sudachipy import dictionary
 #　類似度の取得
 def result():
     search = st.session_state.search
+    search = search.replace(" ","")
+    search = search.replace("　","")
     st.write('検索結果')
     if search == '':
         #　何も入力されていない場合に表示
@@ -22,7 +24,7 @@ def result():
         nlp = spacy.load("ja_ginza")
 
         tokenizer_obj = dictionary.Dictionary().create()
-        mode = tokenizer.Tokenizer.SplitMode.C
+        mode = tokenizer.Tokenizer.SplitMode.B
 
         splitter = nlp.get_pipe("compound_splitter")
         splitter.split_mode = 'C'
@@ -34,6 +36,11 @@ def result():
         normalized_words = [m.normalized_form() for m in tokenizer_obj.tokenize(search, mode)]
         normalized_sentence = ' '.join(normalized_words)
         word_vec_kw = nlp(normalized_sentence)
+
+        # for sentence in word_vec_kw.sents:
+        #     for token in sentence:
+        #         st.write(token.text)
+        #         st.write(token.vector[0:2])
 
         # 文章同士のコサイン類似度を求める
         sim_list = []
@@ -95,7 +102,7 @@ def main():
             nlp = spacy.load("ja_ginza")
             
             tokenizer_obj = dictionary.Dictionary().create()
-            mode = tokenizer.Tokenizer.SplitMode.C
+            mode = tokenizer.Tokenizer.SplitMode.B
 
             splitter = nlp.get_pipe("compound_splitter")
             splitter.split_mode = 'C'
