@@ -31,6 +31,7 @@ def result():
 
         data_list = copy.deepcopy(st.session_state.dl)
         text_list = copy.deepcopy(st.session_state.tl)
+        tag_list = copy.deepcopy(st.session_state.tag)
         word_vec_list = copy.copy(st.session_state.wv)
 
         normalized_words = [m.normalized_form() for m in tokenizer_obj.tokenize(search, mode)]
@@ -49,10 +50,28 @@ def result():
             sim_list.append(sim)
 
         sim_list = list(map(float, sim_list))
-        result = list(zip(sim_list, text_list))
+        result = list(zip(sim_list, text_list, tag_list))
         sort_result = sorted(result, reverse=True)
 
-        for sim_list, text_list in sort_result:
+        req_list = copy.deepcopy(st.session_state.req)
+
+        tag = []
+        for i in range(len(sort_result)):    
+            _, _, x = sort_result[i]
+            tag.append(x)
+        
+        for i in range(len(req_list)):
+            for n in range(len(sort_result)):
+                if req_list[i] not in tag[n]:
+                    sort_result[n] = "null"
+
+        sort_result = list(dict.fromkeys(sort_result))
+        rem = "null"
+        sort_result.remove(rem)
+
+            
+
+        for sim_list, text_list, tag_list in sort_result:
           st.write('類似度: ' + str(sim_list))
           st.write('文章: ' + text_list)
 
@@ -99,6 +118,11 @@ def main():
             for index, data in df_data.iterrows():
                 text_list.append(data['回答'])
 
+            #タグ取得用テキストリスト
+            tag_list = []
+            for index, data in df_data.iterrows():
+                tag_list.append(data['タグ'])
+
             nlp = spacy.load("ja_ginza")
             
             tokenizer_obj = dictionary.Dictionary().create()
@@ -114,13 +138,26 @@ def main():
                 doc_A = nlp(normalized_sentence)
                 word_vec_list.append(doc_A)
 
-
             # データフレームをセッションステートに退避
-            
             st.session_state.df = copy.deepcopy(df)
             st.session_state.dl = copy.deepcopy(data_list)
             st.session_state.tl = copy.deepcopy(text_list)
+            st.session_state.tag = copy.deepcopy(tag_list)
             st.session_state.wv = copy.copy(word_vec_list)
+
+            req_list = []
+
+            s1 = st.sidebar.checkbox('マーケティング')
+            if s1:
+                req_list.append("マーケティング")
+            s2 = st.sidebar.checkbox('ビジネスプラン')
+            if s2:
+                req_list.append("ビジネスプラン")
+            s3 = st.sidebar.checkbox('資金計画')
+            if s3:
+                req_list.append("資金計画")
+
+            st.session_state.req = copy.deepcopy(req_list)
 
             st.text_input("検索入力欄", key="search")
             st.caption("入力例（資金調達　方法）（起業　資金）")
@@ -128,7 +165,7 @@ def main():
                 result()
 
     else:
-        st.subheader('訓練用データをアップロードしてください')
+        st.subheader('データをアップロードしてください')
         
                 
 
