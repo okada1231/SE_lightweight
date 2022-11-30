@@ -51,26 +51,26 @@ def result():
 
         sim_list = list(map(float, sim_list))
         result = list(zip(sim_list, text_list, tag_list))
-        sort_result = sorted(result, reverse=True)
-
-        req_list = copy.deepcopy(st.session_state.req)
 
         tag = []
-        for i in range(len(sort_result)):    
-            _, _, x = sort_result[i]
+        for i in range(len(result)):    
+            _, _, x = result[i]
             tag.append(x)
+
+        req_list = copy.deepcopy(st.session_state.req)
+        if len(req_list) >= 1:
+            left_list = []
+            for i in range(len(req_list)):
+                for n in range(len(result)):
+                    if req_list[i] in tag[n]:
+                        left_list.append(result[n])
+            
+            sort_result = sorted(left_list, reverse=True)
         
-        for i in range(len(req_list)):
-            for n in range(len(sort_result)):
-                if req_list[i] not in tag[n]:
-                    sort_result[n] = "null"
+        if len(req_list) < 1:
+            sort_result = sorted(result, reverse=True)
 
         sort_result = list(dict.fromkeys(sort_result))
-        rem = "null"
-        if rem in sort_result:
-            sort_result.remove(rem)
-
-            
 
         for sim_list, text_list, tag_list in sort_result:
           st.write('類似度: ' + str(sim_list))
