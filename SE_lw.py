@@ -66,9 +66,9 @@ def result():
                     sort_result[n] = "null"
 
         sort_result = list(dict.fromkeys(sort_result))
-        st.write(sort_result)
         rem = "null"
-        sort_result.remove(rem)
+        if rem in sort_result:
+            sort_result.remove(rem)
 
             
 
